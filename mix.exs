@@ -22,7 +22,8 @@ defmodule TaxiBackend.MixProject do
     [
       {:cowboy, "~> 2.8"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.3"}
+      {:plug_cowboy, "~> 2.3"},
+      {:joken, "~> 2.2"}
     ]
   end
 end

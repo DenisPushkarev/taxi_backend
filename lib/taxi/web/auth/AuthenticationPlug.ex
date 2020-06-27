@@ -1,0 +1,30 @@
+defmodule Taxi.Web.Auth.Authentication do
+  import Plug.Conn
+  alias Taxi.Web.Auth.Token, as: TaxiToken
+
+  def init(opts), do: opts
+
+  defp authenticate({conn, "Bearer " <> token}) do
+    case TaxiToken.verify_and_validate(token) do
+      {:ok, %{"role" => role}} -> conn |> assign(:role, role)
+      _ -> conn
+    end
+  end
+
+  defp authenticate({conn}) do
+    conn
+  end
+
+  defp get_auth_header(conn) do
+    case get_req_header(conn, "authorization") do
+      [token] -> {conn, token}
+      _ -> {conn}
+    end
+  end
+
+  def call(conn, _opts) do
+    conn
+    |> get_auth_header
+    |> authenticate
+  end
+end
