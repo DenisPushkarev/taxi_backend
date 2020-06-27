@@ -1,18 +1,12 @@
 defmodule TaxiBackend do
-  @moduledoc """
-  Documentation for `TaxiBackend`.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  def start(_type, _args) do
+    children = [
+      {Plug.Cowboy, scheme: :http, plug: Taxi.Web.Router, options: [port: 4001]}
+    ]
 
-  ## Examples
-
-      iex> TaxiBackend.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    opts = [strategy: :one_for_one, name: Taxi.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 end
