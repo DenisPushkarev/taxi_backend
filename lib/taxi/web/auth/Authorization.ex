@@ -6,7 +6,7 @@ defmodule Taxi.Web.Auth.Authorization do
     case Users |> Taxi.Repo.get_by(login: login) do
       %Users{uuid: uuid, role: role, login: ^login, hashed_password: hashed_password} ->
         if Taxi.Utils.validate_password(password, hashed_password) do
-          {:ok, %{token: makeToken(uuid, role), role: role}}
+          {:ok, %{uuid: uuid, token: makeToken(uuid, role), role: role}}
         else
           :invalid_login
         end

@@ -10,7 +10,7 @@ defmodule Taxi.Web.AuthTest do
 
     assert conn.state == :sent
     assert conn.status == 200
-    assert %{"token" => _, "role" => "driver"} = Jason.decode!(conn.resp_body)
+    assert %{"token" => _, "role" => "driver", "uuid" => _} = Jason.decode!(conn.resp_body)
   end
 
   test "if driver user can not login with wrong password" do

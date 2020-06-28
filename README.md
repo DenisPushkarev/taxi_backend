@@ -17,6 +17,7 @@ TODO: ...
   Success response
   200
   JSON: {
+    uuid: USER_ID
     role: 'manager' || 'driver'
     token: TOKEN
   }
