@@ -1,6 +1,7 @@
 defmodule Taxi.Web.Router do
   use Plug.Router
-  alias Taxi.Web.Auth.{Authentication, Authorization, Access}
+  alias Taxi.Web.Plugs.{Authentication, Access}
+  alias Taxi.Web.Auth.Authorization
 
   plug(Plug.Logger)
   plug(Authentication)
@@ -35,12 +36,18 @@ defmodule Taxi.Web.Router do
   get "/driver/tasks" do
     conn |> send_resp(200, Jason.encode!(%{im: "driver", your: conn.assigns}))
   end
+########### manager routines #################
 
   get "/manager/tasks" do
     conn |> send_resp(200, Jason.encode!(%{im: "manager", your: conn.assigns}))
   end
 
+  post "/manager/task/new" do
+    conn
+  end
+
   match _ do
     send_resp(conn, 404, "not found")
   end
+
 end

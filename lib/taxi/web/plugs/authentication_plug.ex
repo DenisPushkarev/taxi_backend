@@ -1,4 +1,4 @@
-defmodule Taxi.Web.Auth.Authentication do
+defmodule Taxi.Web.Plugs.Authentication do
   import Plug.Conn
   alias Taxi.Web.Auth.Token, as: TaxiToken
 

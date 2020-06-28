@@ -1,4 +1,4 @@
-defmodule Taxi.Web.Auth.Access do
+defmodule Taxi.Web.Plugs.Access do
   import Plug.Conn
   @endpoints ["manager", "driver"]
 
