@@ -28,7 +28,9 @@ defmodule TaxiBackend.MixProject do
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
       {:bcrypt_elixir, "~> 2.0"},
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:geo_postgis, "~> 3.1"},
+      {:geo, "~> 3.3"}
     ]
   end
 

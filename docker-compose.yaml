@@ -15,7 +15,7 @@ services:
   #   command: mix ecto.create && mix ecto.migrate && iex -S mix
   db:
     container_name: db
-    image: postgres:latest
+    image: mdillon/postgis:latest
     ports:
       - "5432:5432"
     environment:

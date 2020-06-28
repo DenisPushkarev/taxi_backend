@@ -5,10 +5,8 @@ defmodule Taxi.Db.Tasks do
   @timestamps_opts [type: :utc_datetime_usec]
 
   schema "tasks" do
-    field(:start_lat, :float)
-    field(:start_lng, :float)
-    field(:end_lat, :float)
-    field(:end_lng, :float)
+    field(:start_point, Geo.PostGIS.Geometry)
+    field(:end_point, Geo.PostGIS.Geometry)
     field(:status, :string)
     field(:driver, :binary_id)
     timestamps()

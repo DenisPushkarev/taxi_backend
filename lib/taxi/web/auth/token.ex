@@ -3,6 +3,6 @@ defmodule Taxi.Web.Auth.Token do
 
   @impl true
   def token_config do
-    default_claims(default_exp: 3600)
+    default_claims(default_exp: 7200)
   end
 end

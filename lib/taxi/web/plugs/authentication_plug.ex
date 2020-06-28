@@ -6,7 +6,7 @@ defmodule Taxi.Web.Plugs.Authentication do
 
   defp authenticate({conn, "Bearer " <> token}) do
     case TaxiToken.verify_and_validate(token) do
-      {:ok, %{"role" => role}} -> conn |> assign(:role, role)
+      {:ok, %{"role" => role, "uuid" => uuid}} -> conn |> assign(:role, role) |> assign(:uuid, uuid)
       _ -> conn
     end
   end
