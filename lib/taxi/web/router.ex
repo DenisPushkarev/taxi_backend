@@ -21,8 +21,8 @@ defmodule Taxi.Web.Router do
   post "/login" do
     case conn.body_params do
       %{"login" => login, "password" => password} ->
-        with {:ok, token} <- Authorization.authorize(login, password) do
-          send_resp(conn, 200, Jason.encode!(%{token: token}))
+        with {:ok, data = %{token: _, role: _}} <- Authorization.authorize(login, password) do
+          send_resp(conn, 200, Jason.encode!(data))
         else
           :invalid_login -> send_resp(conn, 401, Jason.encode!(%{error: "login failed"}))
         end
