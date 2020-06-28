@@ -3,7 +3,8 @@ defmodule TaxiBackend do
 
   def start(_type, _args) do
     children = [
-      {Plug.Cowboy, scheme: :http, plug: Taxi.Web.Router, options: [port: 4001]}
+      {Plug.Cowboy, scheme: :http, plug: Taxi.Web.Router, options: [port: 4001]},
+      Taxi.Repo
     ]
 
     opts = [strategy: :one_for_one, name: Taxi.Supervisor]

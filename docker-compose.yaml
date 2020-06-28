@@ -1,0 +1,25 @@
+version: "3.6"
+services:
+  # elixir:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.elixir.development
+  #   ports:
+  #     - 4001:4001
+  #   volumes:
+  #     - ./my_app:/app
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     TEST: ${TEST}
+  #   command: mix ecto.create && mix ecto.migrate && iex -S mix
+  db:
+    container_name: db
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/db:/data/db
