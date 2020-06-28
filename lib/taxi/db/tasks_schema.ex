@@ -9,7 +9,7 @@ defmodule Taxi.Db.Tasks do
     field(:start_lng, :float)
     field(:end_lat, :float)
     field(:end_lng, :float)
-    field(:status, :integer)
+    field(:status, :string)
     field(:driver, :binary_id)
     timestamps()
   end

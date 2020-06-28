@@ -98,14 +98,10 @@ TODO: ...
 
   POST /manager/task/new
   {
-    from: {
-          latitude,
-          longitude,
-        },
-    to: {
-      latitude,
-      longitude,
-    },
+    start_lat
+    start_lng,
+    end_lat
+    end_lng,
   }
   SUCCESS:
   CODE: 202
@@ -113,4 +109,16 @@ TODO: ...
     task_id: NNNN
   }
 
+  GET /manager/task/:id
+  SUCCESS:
+  CODE: 200
+  {
+    task_id: NNNN
+    start_lat
+    start_lng,
+    end_lat
+    end_lng,
+    status,
+    driver,
+  }
 
