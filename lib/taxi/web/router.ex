@@ -43,7 +43,7 @@ defmodule Taxi.Web.Router do
         with {lat, _} <- Float.parse(lat_str),
              {lng, _} <- Float.parse(lng_str),
              {:ok, %{tasks: tasks}} <- Task.find_nearest(lat, lng),
-             result <- Enum.map(tasks, &Map.drop(&1, [:driver, :status])) do
+             result <- Enum.map(tasks, &Map.drop(&1, [:driver])) do
           j_resp(conn, 200, %{tasks: result})
         else
           _ ->
@@ -63,8 +63,11 @@ defmodule Taxi.Web.Router do
       :ok ->
         conn |> j_resp(202, %{task_id: task_id})
 
-      :not_available ->
-        conn |> j_resp(404, %{error: "Task has been taken"})
+      {:error, :already_taken} ->
+        j_resp(conn, 404, %{error: "Task is already taken"})
+
+      {:error, :driver_has_processing} ->
+        j_resp(conn, 400, %{error: "Driver already has assigned task"})
 
       _ ->
         conn |> invalid_request()
@@ -97,7 +100,7 @@ defmodule Taxi.Web.Router do
                Task.add(%{
                  start_point: {slt, slg},
                  end_point: {elt, elg},
-                 note: Map.get(conn.body_params, :note)
+                 note: Map.get(conn.body_params, "note")
                }) do
           conn |> j_resp(202, %{task_id: uuid})
         else

@@ -46,20 +46,20 @@ defmodule Taxi.Task do
   end
 
   def assign_driver(driver_id, task_id) when is_binary(driver_id) and is_binary(task_id) do
-    from(task in Tasks,
-      where: task.uuid == ^task_id and task.status == "new",
-      update: [set: [driver: ^driver_id, status: "processing"]]
-    )
-    |> Repo.update_all([])
+    case Repo.get_by(Tasks, driver: driver_id, status: "processing") do
+      nil ->
+        result =
+          from(task in Tasks, where: task.uuid == ^task_id and task.status == "new")
+          |> Repo.update_all(set: [driver: driver_id, status: "processing"])
 
-    tasks =
-      from(task in Tasks, where: task.uuid == ^task_id and task.driver == ^driver_id)
-      |> Repo.all()
+        case result do
+          {1, nil} -> :ok
+          {0, nil} -> {:error, :already_taken}
+          _ -> :error
+        end
 
-    case tasks do
-      [%Taxi.Db.Tasks{driver: ^driver_id, uuid: ^task_id}] -> :ok
-      [] -> :not_available
-      _ -> :error
+      _ ->
+        {:error, :driver_has_processing}
     end
   end
 
