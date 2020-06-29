@@ -7,7 +7,8 @@ defmodule Taxi.Db.Tasks do
   schema "tasks" do
     field(:start_point, Geo.PostGIS.Geometry)
     field(:end_point, Geo.PostGIS.Geometry)
-    field(:status, :string)
+    field(:note, :string)
+    field(:status, :string, default: "new")
     field(:driver, :binary_id)
     timestamps()
   end

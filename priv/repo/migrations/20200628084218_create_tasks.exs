@@ -7,6 +7,7 @@ defmodule Taxi.Repo.Migrations.CreateTasks do
     create table(:tasks, primary_key: false) do
       add(:uuid, :uuid, primary_key: true)
       add(:status, :string)
+      add(:note, :string)
       add(:driver, :binary_id)
       timestamps()
     end

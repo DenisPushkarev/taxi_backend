@@ -11,7 +11,7 @@ defmodule Taxi.Web.ManagerTest do
     assert %{"task_id" => _} = Jason.decode!(conn.resp_body)
   end
 
-  test "if manager can get task" do
+  test "if manager can view task" do
     token = authenticate()
     conn = add_test_task(token)
     %{"task_id" => task_id} = Jason.decode!(conn.resp_body)

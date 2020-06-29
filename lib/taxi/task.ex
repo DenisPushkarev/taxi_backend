@@ -4,11 +4,16 @@ defmodule Taxi.Task do
   alias Taxi.Db.Tasks
   alias Taxi.Repo
 
-  def add(%{start: geom_start, end: geom_end}) do
+  def add(%{start_point: {slt, slg}, end_point: {elt, elg}, note: note})
+      when is_float(slt) and is_float(slg) and is_float(elt) and is_float(elg) do
+    geom_start = %Geo.Point{coordinates: {slt, slg}, srid: 4326}
+    geom_end = %Geo.Point{coordinates: {slt, slg}, srid: 4326}
+
     task = %Tasks{
       start_point: geom_start,
       end_point: geom_end,
       uuid: UUID.uuid4(),
+      note: note,
       status: "new"
     }
 
@@ -22,7 +27,7 @@ defmodule Taxi.Task do
   def get(task_id) when is_binary(task_id) do
     case Tasks |> Repo.get_by(uuid: task_id) do
       t = %Tasks{uuid: ^task_id} ->
-        t
+        t |> task_to_map()
 
       _ ->
         :not_found
@@ -33,32 +38,7 @@ defmodule Taxi.Task do
     query = from(t in Tasks, where: fragment("? != ?", t.status, "deleted"))
     total = query |> count()
     tasks = query |> Repo.all()
-
-    r =
-      tasks
-      |> Enum.reduce([], fn %{
-                              uuid: uuid,
-                              driver: driver,
-                              status: status,
-                              start_point: %Geo.Point{coordinates: {start_lat, start_lng}},
-                              end_point: %Geo.Point{coordinates: {end_lat, end_lng}}
-                            },
-                            acc ->
-        acc ++
-          [
-            %{
-              task_id: uuid,
-              status: status,
-              driver: driver,
-              start_lat: start_lat,
-              start_lng: start_lng,
-              end_lat: end_lat,
-              end_lng: end_lng,
-            }
-          ]
-      end)
-
-    {:ok, %{tasks: r, total: total}}
+    {:ok, %{tasks: task_to_map(tasks), total: total}}
   end
 
   defp count(query) do
@@ -103,43 +83,48 @@ defmodule Taxi.Task do
     end
   end
 
-  def find_nearest(lat, lng, _opts \\ %{}) when is_float(lat) and is_float(lng) do
+  def find_nearest(lat, lng, opts \\ %{}) when is_float(lat) and is_float(lng) do
     geom = %Geo.Point{coordinates: {lat, lng}, srid: 4326}
+    limit = min(100, Map.get(opts, :limit, 20))
 
     query =
-      from(tasks in Tasks,
-        limit: 5,
-        where: tasks.status == "new",
-        order_by: st_distancesphere(tasks.start_point, ^geom),
-        select:
-          {tasks.uuid, tasks.start_point, tasks.end_point,
-           st_distancesphere(tasks.start_point, ^geom)}
+      from(task in Tasks,
+        limit: ^limit,
+        where: task.status == "new",
+        order_by: st_distance(task.start_point, ^geom)
       )
 
-    tasks_with_geom = query |> Repo.all()
-
     tasks =
-      Enum.reduce(tasks_with_geom, [], fn
-        {
-          uuid,
-          %Geo.Point{coordinates: {start_lat, start_lng}},
-          %Geo.Point{coordinates: {end_lat, end_lng}},
-          distance
-        },
-        acc ->
-          acc ++
-            [
-              %{
-                task_id: uuid,
-                start_lat: start_lat,
-                start_lng: start_lng,
-                end_lat: end_lat,
-                end_lng: end_lng,
-                distance: (distance / 1000) |> Decimal.from_float() |> Decimal.round(0)
-              }
-            ]
-      end)
+      query
+      |> Repo.all()
+      |> task_to_map()
+      |> Enum.map(
+        &Map.put(
+          &1,
+          :distance,
+          (Geocalc.distance_between([&1.start_lat, &1.start_lng], [lat, lng]) / 1000)
+          |> Decimal.from_float()
+          |> Decimal.round(0)
+        )
+      )
 
     {:ok, %{tasks: tasks}}
+  end
+
+  defp task_to_map(t = %Taxi.Db.Tasks{}) when is_map(t) do
+    %{
+      task_id: t.uuid,
+      start_lat: t.start_point.coordinates |> elem(0),
+      start_lng: t.start_point.coordinates |> elem(1),
+      end_lat: t.end_point.coordinates |> elem(0),
+      end_lng: t.start_point.coordinates |> elem(1),
+      driver: t.driver,
+      status: t.status,
+      note: t.note
+    }
+  end
+
+  defp task_to_map(tasks) when is_list(tasks) do
+    Enum.map(tasks, &task_to_map(&1))
   end
 end

@@ -30,7 +30,8 @@ defmodule TaxiBackend.MixProject do
       {:bcrypt_elixir, "~> 2.0"},
       {:uuid, "~> 1.1"},
       {:geo_postgis, "~> 3.1"},
-      {:geo, "~> 3.3"}
+      {:geo, "~> 3.3"},
+      {:geocalc, "~> 0.8.1"}
     ]
   end
 
@@ -38,7 +39,13 @@ defmodule TaxiBackend.MixProject do
     [
       "ecto.init": ["ecto.drop", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate", "run priv/repo/seeds.exs", "test"]
+      test: [
+        "ecto.drop --quiet",
+        "ecto.create --quiet",
+        "ecto.migrate",
+        "run priv/repo/seeds.exs",
+        "test"
+      ]
     ]
   end
 end
